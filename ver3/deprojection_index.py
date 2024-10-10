@@ -52,3 +52,9 @@ def get_ymap_index_planck(comparison_group):
                         DAT+'CMB_ymap/Planck/ymap/SED_dbetadT/deproject_CMB5_CIB_CIBdbeta_CIBdT_beta1.6_T10.14_standard_full.fits']
     
     return ymap_name_list, ymap_path_list
+
+
+
+
+def get_ymap_index_act(comparison_group):
+    return None, None
