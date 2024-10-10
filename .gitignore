@@ -76,3 +76,5 @@ ver3/result/nobeam/namaster_comparison_yy.txt
 ver3/result/nobeam/namaster_comparison0.txt
 ver3/result/nobeam/namaster_comparison1.txt
 ver3/result/nobeam/namaster_comparison2.txt
+assets/__pycache__/__init__.cpython-311.pyc
+assets/__pycache__/deprojection_index.cpython-311.pyc
