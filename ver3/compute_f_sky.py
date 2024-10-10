@@ -8,8 +8,8 @@ import pandas as pd
 #HEALPix map resolution
 NSIDE = 2048
 
-JOB = '/mnt/d/data_large/unwise_sz/'
-PATHMAP = JOB + 'unWISE/' 
+DAT = '/mnt/d/data_large/unwise_sz/'
+PATHMAP = DAT + 'unWISE/' 
 
 unWISE_mask_name = PATHMAP + 'mask/mask_unWISE_full_v10.fits'
 pl_mask_name = PATHMAP + 'mask/mask_unWISE_full_v10.fits'

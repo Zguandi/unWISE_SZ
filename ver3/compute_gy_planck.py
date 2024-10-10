@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import pymaster as nmt
 from astropy.io import fits
 
+# cuntom package
+import deprojection_index
+
 sample1 = 1
 sample2 = 1
 
@@ -13,8 +16,11 @@ if sample1 == 5 or sample1 == 6:
 #HEALPix map resolution
 NSIDE = 2048
 
-JOB = '/mnt/d/data_large/unwise_sz/'
-PATHMAP = JOB + 'unWISE/' 
+DAT = '/mnt/d/data_large/unwise_sz/'
+PATHMAP = DAT + 'unWISE/' 
+
+PATHWEIGHTS = PATHMAP + 'weights/'
+
 ########################################
 ### READING RAW MAPS PATH
 ########################################
@@ -69,7 +75,6 @@ mask_lost = lost[0].data
 
 #   First field
 
-PATHWEIGHTS = PATHMAP + 'weights/'
 pathweight1 = PATHWEIGHTS + 'blue_w2_5sig_weights.fits'
 pathweight2 = PATHWEIGHTS + 'blue_star_weights.fits'
 weight1 = hp.read_map(pathweight1)
@@ -121,58 +126,11 @@ NSIDE = 2048
 lmax = 4096
 bin = 50
 
-y_mask = np.load(JOB+'Planck/mask/y_mask.npy')
+y_mask = np.load(DAT+'Planck/mask/y_mask.npy')
 
 comparison_group = 2
 
-if comparison_group == 0:
-    #CIB deprojection
-    ymap_name_list = ['no_deprojection',
-                        'CIB+CMB_T=10.17beta=1.7',
-                        'CIB+CMB_T=24beta=1.0',
-                        'CIB+CMB_T=24beta=1.4',
-                        'CIB+CMB_T=10.14beta=1.4',
-                        'CIB+CMB_T=10.14beta=1.6']
-
-    ymap_path_list = [
-                    JOB+'CMB_ymap/Planck/ymap/no_deprojection_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/deproject_CMB_CIB_default_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/SED/deproject_CMB_CIB_beta1.0_T24_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/SED/deproject_CMB_CIB_beta1.4_T24_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/SED/deproject_CMB_CIB_beta1.4_T10.14_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/SED/deproject_CMB_CIB_beta1.6_T10.14_standard_full.fits']
-elif comparison_group == 1:
-    #CIB + CIBdbeta deprojection
-    ymap_name_list = [
-                    'no_deprojection',
-                    'CMB+CIB+CIBdbeta_T=10.17beta=1.7',
-                    'CMB+CIB+CIBdbeta_T=24beta=1.0',
-                    'CMB+CIB+CIBdbeta_T=24beta=1.4',
-                    'CMB+CIB+CIBdbeta_T=10.14beta=1.4',
-                    'CMB+CIB+CIBdbeta_T=10.14beta=1.6']
-    ymap_path_list = [
-                    JOB+'CMB_ymap/Planck/ymap/no_deprojection_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/deproject_CMB5_CIB_CIBdbeta_default_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/SED_dbeta/deproject_CMB5_CIB_CIBdbeta_beta1.0_T24_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/SED_dbeta/deproject_CMB5_CIB_CIBdbeta_beta1.4_T24_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/SED_dbeta/deproject_CMB5_CIB_CIBdbeta_beta1.4_T10.14_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/SED_dbeta/deproject_CMB5_CIB_CIBdbeta_beta1.6_T10.14_standard_full.fits']
-elif comparison_group == 2:
-    ymap_name_list = [
-                    'no_deprojection',
-                    'CMB+CIB+CIBdbetadT_T=10.17beta=1.7',
-                    'CMB+CIB+CIBdbetadT_T=24beta=1.0',
-                    'CMB+CIB+CIBdbetadT_T=24beta=1.4',
-                    'CMB+CIB+CIBdbetadT_T=10.14beta=1.4',
-                    'CMB+CIB+CIBdbetadT_T=10.14beta=1.6']
-
-    ymap_path_list = [
-                    JOB+'CMB_ymap/Planck/ymap/no_deprojection_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/deproject_CMB5_CIB_CIBdbeta_CIBdT_default_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/SED_dbetadT/deproject_CMB5_CIB_CIBdbeta_CIBdT_beta1.0_T24_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/SED_dbetadT/deproject_CMB5_CIB_CIBdbeta_CIBdT_beta1.4_T24_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/SED_dbetadT/deproject_CMB5_CIB_CIBdbeta_CIBdT_beta1.4_T10.14_standard_full.fits',
-                    JOB+'CMB_ymap/Planck/ymap/SED_dbetadT/deproject_CMB5_CIB_CIBdbeta_CIBdT_beta1.6_T10.14_standard_full.fits']
+ymap_name_list, ymap_path_list = deprojection_index.get_ymap_index_planck(comparison_group)
 
 ########################################
 ### GALAXY NAMASTER FIELD

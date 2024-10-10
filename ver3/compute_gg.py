@@ -14,8 +14,13 @@ if sample1 == 5 or sample1 == 6:
 #HEALPix map resolution
 NSIDE = 2048
 
-JOB = '/mnt/d/data_large/unwise_sz/'
-PATHMAP = JOB + 'unWISE/' 
+DAT = '/mnt/d/data_large/unwise_sz/'
+PATHMAP = DAT + 'unWISE/' 
+PATHWEIGHTS = PATHMAP + 'weights/'
+
+RES = '/mnt/c/Users/gdzhao/projects/unwise_sz/ver3/'
+PATHRESULTS = RES +'result/nobeam/'
+
 ########################################
 ### READING RAW MAPS PATH
 ########################################
@@ -70,7 +75,6 @@ mask_lost = lost[0].data
 
 #   First field
 
-PATHWEIGHTS = PATHMAP + 'weights/'
 pathweight1 = PATHWEIGHTS + 'blue_w2_5sig_weights.fits'
 pathweight2 = PATHWEIGHTS + 'blue_star_weights.fits'
 weight1 = hp.read_map(pathweight1)
@@ -134,9 +138,6 @@ ll = b.get_effective_ells()
 
 header = ['ell', 'cl_gg']
 data = np.column_stack((ll, cl_gg_1))
-
-
-PATHRESULTS = '/mnt/c/Users/gdzhao/projects/unwise_sz/ver3/result/nobeam/'
 
 df = pd.DataFrame(data, columns=header)
 df.to_csv(PATHRESULTS + 'namaster_comparison_gg.csv', index=False)
