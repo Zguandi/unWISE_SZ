@@ -1,4 +1,3 @@
-
 import numpy as np
 import healpy as hp
 from astropy.io import fits
@@ -9,7 +8,8 @@ from astropy.io import fits
 # if sample1 == 5 or sample1 == 6:
 #     print('Please make the CMB lensing map the second argument.')
 
-#HEALPix map resolution
+# HEALPix map resolution
+
 NSIDE = 2048
 
 DAT = '/mnt/d/data_large/unwise_sz/'
@@ -111,7 +111,6 @@ def makemap(sample):
     #hp.mollview(map)
     #pl.show()
     ########################################
-        
     return map
 
 def readmask():
