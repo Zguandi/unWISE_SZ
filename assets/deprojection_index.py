@@ -11,7 +11,6 @@ def get_ymap_index_planck(comparison_group):
                             'CIB+CMB_T=24beta=1.4',
                             'CIB+CMB_T=10.14beta=1.4',
                             'CIB+CMB_T=10.14beta=1.6']
-
         ymap_path_list = [
                         DAT+'CMB_ymap/Planck/ymap/no_deprojection_standard_full.fits',
                         DAT+'CMB_ymap/Planck/ymap/deproject_CMB_CIB_default_standard_full.fits',
@@ -77,8 +76,19 @@ def get_ymap_index_act():
         codex.append(index)
     return codex
 
+def get_ACT_map_path():
+    filename = os.listdir(DAT+'ACT/mask/')
+    pathlist = []
+    for i in range(len(filename)):
+        pathlist.append(DAT+'ACT/mask/'+filename[i])
+    return pathlist
+
 if __name__ == '__main__':
     codex = get_ymap_index_act()
     
     for i in range(len(codex)):
         print(codex[i].deprotype,codex[i].nu,codex[i].T)
+        
+    pathlist = get_ACT_map_path()
+    for i in range(len(pathlist)):
+        print(pathlist[i])
