@@ -26,3 +26,4 @@ with fits.open(pathmaskact) as hdul:
 print(galmask.shape)
 # print(actmask.shape)
 OUTPATH = '/mnt/c/Users/gdzhao/projects/unwise_sz/ver3/result/nobeam/'
+
