@@ -9,9 +9,12 @@ binnum = 50
 DAT = '/mnt/d/data_large/unwise_sz/'
 OUT = '/mnt/c/Users/gdzhao/projects/unwise_sz/Planck_temperature/'
 
-pathMaskPlanck = DAT + 'Planck/temp/HFI_Mask_GalPlane-apo1_2048_R2.00.fits'
+# pathMaskHFI = DAT + 'Planck/temp/HFI_Mask_GalPlane-apo1_2048_R2.00.fits'
+
+pathMaskPlanck = DAT+ 'Planck/temp/COM_Mask_CMB-common-Mask-apo1_2048_R3.00.fits'
 
 pathMapPlanck = DAT + 'Planck/temp/COM_CMB_IQU-smica_2048_R3.00_full.fits'
+
 
 print('Reading mask and map...')
 mask_apodized = hp.read_map(pathMaskPlanck, field=0)
