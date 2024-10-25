@@ -1,5 +1,3 @@
-# stacking of CMB y-maps around regions close to unWISE objects.
-
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
@@ -16,7 +14,71 @@ catalog_list = os.listdir(UNWISE)
 CMBY = '/mnt/d/data_large/unwise_sz/CMB_ymap/Planck/ymap/'
 cmb_list = os.listdir(CMBY)
 
-def read_catalog(catalogPath):
+class catalog_object:
+    def __init__(self,ra = None,dec = None,flux_w1 = None,flux_w2 = None,nside = NSIDE):
+        
+        self.ra = ra
+        self.dec = dec
+        self.fix_coords()
+        
+        self.flux_w1 = flux_w1
+        self.flux_w2 = flux_w2
+        self.pix = hp.ang2pix(nside, self.l, self.b, lonlat=True)
+    
+    def __repr__(self):
+        return 'ra: {}, dec: {}, l: {}, b: {}, flux_w1: {}, flux_w2: {}, pix: {}'.format(self.ra, self.dec, self.l, self.b, self.flux_w1, self.flux_w2, self.pix)
+    
+    def fix_coords(self):
+        self.coords = SkyCoord(ra=self.ra*u.degree, dec=self.dec*u.degree, frame='icrs')
+        self.l, self.b = self.coords.galactic.l.value, self.coords.galactic.b.value
+        return None
+        
+    def get_neighbours(self,angle_distance_deg, nside=NSIDE):
+        angular_distance = np.radians(angle_distance_deg)
+        neighbour_pix = hp.query_disc(nside, hp.ang2vec(self.l, self.b, lonlat=True), angular_distance)
+        return neighbour_pix
+
+    def get_ymap_vals(self,angle_distance_deg,ymap=None,nside=NSIDE):
+        if ymap is None:
+            return None
+        else:
+            neighbour_pixels = self.get_neighbours(angle_distance_deg, nside=nside)
+            return ymap[neighbour_pixels]
+    
+    def get_pixel_vals_hist(self,angle_distance_deg,ymap=None,nside=NSIDE,nbins=100):
+        pixels = self.get_neighbours(angle_distance_deg,nside=nside)
+        values = self.get_ymap_vals(angle_distance_deg,ymap=ymap,nside=nside)
+        centre_pixel = self.pix
+        return self.cast_values_2d(pixels,centre_pixel,values,nbins=nbins)
+    
+    def cast_values_2d(self,pixels,centre_pixel,values,nbins = 100):
+        vec_centre = hp.pix2vec(NSIDE,centre_pixel)
+        vecs = hp.pix2vec(NSIDE,pixels)
+
+        # set x axis perpendicular to the centre pixel
+        x_axis = np.cross(vec_centre,[0,0,1])
+        x_axis = x_axis/np.linalg.norm(x_axis)
+        
+        # set y axis perpendicular to the centre pixel and the x axis
+        y_axis = np.cross(vec_centre,x_axis)
+        y_axis = y_axis/np.linalg.norm(y_axis)
+        
+        # project the vectors onto the x and y axes
+        x_projections = np.dot(x_axis,vecs)
+        y_projections = np.dot(y_axis,vecs)
+        
+        # create a 2d histogram
+        hist, xedges, yedges = np.histogram2d(x_projections, y_projections, bins=nbins, weights=values)
+        
+        # get the bin centers
+        xcenters = (xedges[:-1] + xedges[1:]) / 2
+        ycenters = (yedges[:-1] + yedges[1:]) / 2
+        
+        return xcenters, ycenters, hist.T
+    
+
+
+def read_catalog(catalogPath,ntest = None):
     try:
         catalog = fits.open(catalogPath)[1].data
     except:
@@ -26,85 +88,37 @@ def read_catalog(catalogPath):
     ra = catalog['ra']
     dec = catalog['dec']
     
-    coords = SkyCoord(ra=ra*u.degree, dec=dec*u.degree, frame='icrs')
-    l, b = coords.galactic.l.value, coords.galactic.b.value
-    
     flux_w1 = catalog['flux_w1']
     flux_w2 = catalog['flux_w2']
     
-    pix = hp.ang2pix(NSIDE, l, b, lonlat=True)
+    # yield a iterable object containing the catalog objects
+    # if ntest is interval (a,b) then it will return objects from a to b
+    # if ntest is a number it will return the first ntest objects
     
-    base_catalog = {'ra': ra, 'dec': dec, 'l': l, 'b': b, 'flux_w1': flux_w1, 'flux_w2': flux_w2, 'pix': pix}
-    return base_catalog
-
-def test_catalog(catalog,ntest):
+    if ntest is None:
+        ntest = range(len(ra))
+    elif isinstance(ntest,list):
+        pass
+    elif isinstance(ntest,tuple):
+        a,b = ntest
+        ntest = range(a,b)
+    elif isinstance(ntest,int):
+        ntest = range(ntest)
     
-    indices = np.random.choice(len(catalog['ra']),ntest,replace=False)
-    
-    ra = catalog['ra'][indices]
-    dec = catalog['dec'][indices]
-    l = catalog['l'][indices]
-    b = catalog['b'][indices]
-    flux_w1 = catalog['flux_w1'][indices]
-    flux_w2 = catalog['flux_w2'][indices]
-    pix = catalog['pix'][indices]
-    
-    return {'ra': ra, 'dec': dec, 'l': l, 'b': b, 'flux_w1': flux_w1, 'flux_w2': flux_w2, 'pix': pix}
-
-def get_pixel_around_centre(l,b,nside=NSIDE,radius_deg = 1.0):
-    vec_centre = hp.ang2vec(l,b,lonlat=True)
-    radius_rad = np.radians(radius_deg)
-    pix_neighbors = hp.query_disc(nside, vec_centre, radius_rad)
-    vec_neighbors = np.array(hp.pix2vec(nside, pix_neighbors)).T
-    
-    # define local 2D coordinate system
-    x_axis = np.cross(vec_centre, [0,0,1])
-    y_axis = np.cross(vec_centre, x_axis)
-    x_axis /= np.linalg.norm(x_axis)
-    y_axis /= np.linalg.norm(y_axis)
-
-    # project the neighbors onto the local 2D coordinate system
-    proj_x = np.dot(vec_neighbors, x_axis)
-    proj_y = np.dot(vec_neighbors, y_axis)
-    
-    proj_catalog = {'x': proj_x, 'y': proj_y, 'pix': pix_neighbors}
-    return proj_catalog
-
-def get_yvalue(proj_catalogs,ymap):
-    for proj_catalog in proj_catalogs:
-        ymap_pix = proj_catalog['pix']
-        ymap_values = ymap[ymap_pix]
-        proj_catalog['ymap'] = ymap_values
-    return proj_catalog
-    
-def stack_yvalue(proj_catalog_list,nbins = 100,boundary_angle = 1.0):
-    counts = np.zeros((nbins,nbins),dtype=np.int64)
-    ystack = np.zeros((nbins,nbins),dtype=np.float64)
-    
-    boundary_angle = np.radians(boundary_angle)
-    x_min, x_max = -np.sin(boundary_angle), np.sin(boundary_angle)
-    y_min, y_max = -np.sin(boundary_angle), np.sin(boundary_angle)
-    
-    x_bins = np.linspace(x_min,x_max,nbins+1)
-    y_bins = np.linspace(y_min,y_max,nbins+1)
-    
-    for proj_catalog in proj_catalog_list:
-        x = proj_catalog['x']
-        y = proj_catalog['y']
-        ymap = proj_catalog['ymap']
+    for i in ntest:
+        yield catalog_object(ra[i], dec[i], flux_w1[i], flux_w2[i])
         
-        x_idx = np.digitize(x,x_bins) - 1
-        y_idx = np.digitize(y,y_bins) - 1
         
-        for i in range(len(x)):
-            counts[x_idx[i],y_idx[i]] += 1
-            ystack[x_idx[i],y_idx[i]] += ymap[i]
-    
-    ystack /= counts
-    return counts,ystack
-
 if __name__ == '__main__':
-    catalog_base = read_catalog(UNWISE + catalog_list[0])
-    catalog_test = test_catalog(catalog_base,10)
+    catalogPath = UNWISE + catalog_list[0]
+    ymapPath = CMBY + cmb_list[0]
     
-    print(catalog_test['ra'], catalog_test['dec'])
+    catalog = read_catalog(catalogPath,ntest=(0,10))
+    ymap = hp.read_map(ymapPath)
+    
+    for obj in catalog:
+        print(obj)
+        print(obj.get_pixel_vals_hist(1,ymap=ymap,nbins=100))
+        print('\n\n')
+        
+    print('done')
