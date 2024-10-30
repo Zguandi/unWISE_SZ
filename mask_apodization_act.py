@@ -1,29 +1,18 @@
-import numpy as np
-import healpy as hp
-import matplotlib.pyplot as plt
-import pymaster as nmt
-from astropy.io import fits
-
-# custom package
-from assets import deprojection_index
-from assets import make_galaxy_map
-#HEALPix map resolution
-NSIDE = 2048
+# This is the apodization for act SZ times galaxy mask galaxy mask
 
 DAT = '/mnt/d/data_large/unwise_sz/'
 
-pathmaskact = DAT + 'ACT/mask/wide_mask_GAL070_apod_1.50_deg_wExtended.fits'
+import numpy as np
+import healpy as hp
+from astropy.io import fits
+import pymaster as nmt
 
-galmask = make_galaxy_map.readmask()
+pathmask = DAT+'ACT/mask/healpix_act_mask_nside2048.fits'
 
+aposcale = 1.0
+OUT = DAT + 'Planck/temp/COM_Mask_CMB-common-Mask-apo1_2048_R3.00.fits'
 
-with fits.open(pathmaskact) as hdul:
-    hdul.info()
-    data = hdul[0].data
-    
-    print(data.shape)
+mask = hp.read_map(pathMaskPlanck, field=0).astype(np.float64)
+mask_apodized = nmt.mask_apodization(mask, aposcale, apotype='C1')
 
-print(galmask.shape)
-# print(actmask.shape)
-OUTPATH = '/mnt/c/Users/gdzhao/projects/unwise_sz/ver3/result/nobeam/'
-
+hp.write_map(OUT, mask_apodized, overwrite=True)

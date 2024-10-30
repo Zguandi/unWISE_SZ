@@ -1,11 +1,6 @@
 
 DAT = '/mnt/d/data_large/unwise_sz/'
-BEAM = '/mnt/d/data_large/unwise_sz/ACT/act_beam/effective_beam.txt'
-
 import os
-import numpy as np
-from astropy.io import fits
-from pixell import enmap, utils, reproject, wcsutils
 
 def get_ymap_index_planck(comparison_group):
     if comparison_group == 0:
@@ -67,62 +62,6 @@ class deprojection_index_act:
         self.nu = float(filename.split('_')[-2])
         self.T = float(filename.split('_')[-1][:-5])
         self.path = directory+filename
-    
-    def __repr__(self):
-        return f'map object with {self.deprotype} {self.nu} {self.T}'
-
-    def shape(self):
-        with fits.open(self.path) as hdul:
-            data = hdul[0].data
-        return data.shape
-    
-    def read(self):
-        with fits.open(self.path) as hdul:
-            data = np.array(hdul[0].data,dtype=np.float32)
-            header = hdul[0].header
-        return data, header
-    
-    def generate_map(self,nside=2048):
-        data,header = self.read()
-        wcs = wcsutils.WCS(header)
-        enmap_obj = enmap.ndmap(data,wcs)
-
-        print("Generating HEALPix map...")
-        heapix_map = reproject.healpix_from_enmap(enmap_obj, nside=nside, lmax=3*nside-1)
-        
-        return heapix_map
-
-class mask_index_act:
-    def __init__(self,directory:str,filename:str):
-        self.dir = directory
-        self.filename = filename
-        self.path = directory+filename
-        self.name = None
-    
-    def __repr__(self):
-        return f'mask_object at {self.filename}'
-    
-    def shape(self):
-        with fits.open(self.path) as hdul:
-            data = hdul[0].data
-        return data.shape
-    
-    def read(self):
-        with fits.open(self.path) as hdul:
-            data = np.array(hdul[0].data,dtype=np.float32)
-            header = hdul[0].header
-        return data, header
-    
-    def generate_map(self,nside=2048):
-        data,header = self.read()
-        wcs = wcsutils.WCS(header)
-        enmap_obj = enmap.ndmap(data,wcs)
-
-        print("Generating HEALPix map...")
-        heapix_mask = reproject.healpix_from_enmap(enmap_obj, nside=nside, lmax=3*nside-1)
-        
-        return heapix_mask
-
 
 def get_ymap_index_act():
     filename_cib = os.listdir(DAT+'ACT/deprojections/cib/')
@@ -137,26 +76,12 @@ def get_ymap_index_act():
         codex.append(index)
     return codex
 
-def get_ACT_mask_path():
+def get_ACT_map_path():
     filename = os.listdir(DAT+'ACT/mask/')
     pathlist = []
     for i in range(len(filename)):
         pathlist.append(DAT+'ACT/mask/'+filename[i])
     return pathlist
-
-def get_mask_index_act():
-    filename = os.listdir(DAT+'ACT/mask/')
-    codex = []
-    for i in range(len(filename)):
-        index = mask_index_act(DAT+'ACT/mask/',filename[i])
-        codex.append(index)
-    return codex
-
-def read_beam():
-    beam = np.loadtxt(BEAM,skiprows=1)
-    ells = beam[:,0]
-    beam = beam[:,1]
-    return ells,beam
 
 if __name__ == '__main__':
     codex = get_ymap_index_act()
@@ -164,9 +89,6 @@ if __name__ == '__main__':
     for i in range(len(codex)):
         print(codex[i].deprotype,codex[i].nu,codex[i].T)
         
-    pathlist = get_ACT_mask_path()
+    pathlist = get_ACT_map_path()
     for i in range(len(pathlist)):
         print(pathlist[i])
-        
-    ells,beam = read_beam()
-    print(ells,beam)

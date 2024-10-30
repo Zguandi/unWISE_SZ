@@ -116,14 +116,16 @@ def makemap(sample):
 def readmask():
     ########################################
     print('Reading mask...')
-    mask = hp.read_map(pathmask)
-    lost = fits.open(lostmap)
+    mask = hp.read_map(PATHMAP+'mask/mask_unWISE_full_v10.fits')
+    lost = fits.open(PATHMAP+"loss/unmaskedareafrac-flag.fits")
     mask_lost = lost[0].data
-    invalid = mask_lost == 0
+    valid = (mask_lost != 0).astype(np.float64)
     
-    galmask = mask * invalid
+    galmask = mask * valid
     ########################################
     return galmask
     
 if __name__ == "__main__":
-    readmask()
+    mask = readmask()
+    print(np.min(mask),np.max(mask))
+    print(np.sum(mask))
