@@ -6,6 +6,7 @@ import os
 import numpy as np
 from astropy.io import fits
 from pixell import enmap, utils, reproject, wcsutils
+import healpy as hp
 
 def get_ymap_index_planck(comparison_group):
     if comparison_group == 0:
@@ -123,7 +124,6 @@ class mask_index_act:
         
         return heapix_mask
 
-
 def get_ymap_index_act():
     filename_cib = os.listdir(DAT+'ACT/deprojections/cib/')
     filename_cibdbeta = os.listdir(DAT+'ACT/deprojections/cib_cibdbeta/')
@@ -135,6 +135,29 @@ def get_ymap_index_act():
     for i in range(len(filename_cibdbeta)):
         index =  deprojection_index_act(DAT+'ACT/deprojections/cib_cibdbeta/',filename_cibdbeta[i])
         codex.append(index)
+    return codex
+
+def get_ymap_index_act_selected(deprotype,nu_range=[1.0,2.0],T_range=[10.7,24.0]):
+    filename_cib = os.listdir(DAT+'ACT/deprojections/cib/')
+    filename_cibdbeta = os.listdir(DAT+'ACT/deprojections/cib_cibdbeta/')
+    
+    codex = []
+    for i in range(len(filename_cib)):
+        index =  deprojection_index_act(DAT+'ACT/deprojections/cib/',filename_cib[i])
+        
+        if index.deprotype == deprotype:
+            if index.nu<=nu_range[1] and index.nu>=nu_range[0]:
+                if index.T<=T_range[1] and index.T>=T_range[0]:
+                    codex.append(index)
+                    
+    for i in range(len(filename_cibdbeta)):
+        index =  deprojection_index_act(DAT+'ACT/deprojections/cib_cibdbeta/',filename_cibdbeta[i])
+        
+        if index.deprotype == deprotype:
+            if index.nu<=nu_range[1] and index.nu>=nu_range[0]:
+                if index.T<=T_range[1] and index.T>=T_range[0]:
+                    codex.append(index)
+                    
     return codex
 
 def get_ACT_mask_path():
@@ -158,15 +181,27 @@ def read_beam():
     beam = beam[:,1]
     return ells,beam
 
+def read_composite_mask(apodize = True):
+    if apodize:
+        pathmask = DAT + 'unwiseact/act_mask_composite/healpix_act_mask_nside2048_apo1_5.fits'
+    else:
+        pathmask = DAT + 'unwiseact/act_mask_composite/healpix_act_mask_nside2048.fits'
+    mask = hp.read_map(pathmask)
+    return mask
+
 if __name__ == '__main__':
-    codex = get_ymap_index_act()
+    # codex = get_ymap_index_act()
     
-    for i in range(len(codex)):
-        print(codex[i].deprotype,codex[i].nu,codex[i].T)
+    # for i in range(len(codex)):
+    #     print(codex[i].deprotype,codex[i].nu,codex[i].T)
         
-    pathlist = get_ACT_mask_path()
-    for i in range(len(pathlist)):
-        print(pathlist[i])
+    # pathlist = get_ACT_mask_path()
+    # for i in range(len(pathlist)):
+    #     print(pathlist[i])
         
     ells,beam = read_beam()
     print(ells,beam)
+    
+    # codex = get_ymap_index_act_selected(deprotype = 'cibdBeta',nu_range=[1.0,1.4],T_range=[10.7,12.0])
+    # for i in range(len(codex)):
+    #     print(codex[i].deprotype,codex[i].nu,codex[i].T)

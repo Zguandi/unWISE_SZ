@@ -8,7 +8,7 @@ from astropy.io import fits
 # if sample1 == 5 or sample1 == 6:
 #     print('Please make the CMB lensing map the second argument.')
 
-# HEALPix map resolution
+# HEALPix map resolution (nside)
 
 NSIDE = 2048
 
@@ -19,13 +19,13 @@ PATHWEIGHTS = PATHMAP + 'weights/'
 pathweight1 = PATHWEIGHTS + 'blue_w2_5sig_weights.fits'
 pathweight2 = PATHWEIGHTS + 'blue_star_weights.fits'
 pathmask = PATHMAP+'mask/mask_unWISE_full_v10.fits'
-lostmap = PATHMAP+"loss/unmaskedareafrac-flag.fits"
+lostmap = PATHMAP+'loss/unmaskedareafrac-flag.fits'
 
 ########################################
 ### READING RAW MAPS PATH
 ########################################
 
-def read_path(sample):
+def read_path(sample=1):
     # if sample == 5:
     #     map_name = PATHMAP + 'PLANCK_LENSING/COM_Lensing_4096_R3.00/MV/dat_klm.fits'
     # elif sample == 6:
@@ -48,7 +48,7 @@ def read_path(sample):
     map_name = PATHMAP + 'blue/numcounts_map1_2048-r1-v2_flag.fits'
     return map_name
 
-def makemap(sample):
+def makemap(sample=1):
         # if (sample == 5) or (sample == 6):
         #     print('Making lensing map')
         #     kappa_map_alm = hp.read_alm(read_path(sample))
@@ -69,16 +69,16 @@ def makemap(sample):
         
     ########################################
     print('Reading weights...') 
-    weight1 = hp.read_map(pathweight1)
-    weight2 = hp.read_map(pathweight2)
+    weight1 = hp.read_map(PATHWEIGHTS + 'blue_w2_5sig_weights.fits')
+    weight2 = hp.read_map(PATHWEIGHTS + 'blue_star_weights.fits')
     weights = hp.ud_grade(weight1*weight2,2048)
     ########################################
     
     
     ########################################
     print('Reading mask...')
-    mask = hp.read_map(pathmask)
-    lost = fits.open(lostmap)
+    mask = hp.read_map(PATHMAP+'mask/mask_unWISE_full_v10.fits')
+    lost = fits.open(PATHMAP+'loss/unmaskedareafrac-flag.fits')
     mask_lost = lost[0].data
     ########################################
     
@@ -124,8 +124,23 @@ def readmask():
     galmask = mask * valid
     ########################################
     return galmask
+
+def read_compositemask(apodize = True):
+    ########################################
+    print('Reading mask...')
     
+    if apodize:
+        pathmask = DAT + 'unwiseact/unwise_mask_composite/healpix_unwise_mask_nside2048_apo1_5.fits'
+    else:
+        pathmask = DAT + 'unwiseact/unwise_mask_composite/healpix_unwise_mask_nside2048.fits'
+
+    galmask = hp.read_map(pathmask)
+    return galmask
+
 if __name__ == "__main__":
-    mask = readmask()
-    print(np.min(mask),np.max(mask))
-    print(np.sum(mask))
+    # mask = readmask()
+    # print(np.min(mask),np.max(mask))
+    # print(np.sum(mask))
+    blue_counts_map = makemap()
+    print(np.min(blue_counts_map),np.max(blue_counts_map))
+    print(np.sum(blue_counts_map))
