@@ -89,7 +89,7 @@ class deprojection_index_act:
         enmap_obj = enmap.ndmap(data,wcs)
 
         # print("Generating HEALPix map...")
-        heapix_map = reproject.map2healpix(enmap_obj, nside=nside, lmax=3*nside-1, out=None, rot='cel,gal', spin=[0, 2], method='harm', order=1, extensive=False, bsize=100000, nside_mode='pow2', boundary='constant', verbose=True, niter=0)
+        heapix_map = reproject.map2healpix(enmap_obj, nside=nside, lmax=3*nside-1, rot='equ,gal', verbose=True, niter=0)
         
         return heapix_map
 
@@ -120,7 +120,7 @@ class mask_index_act:
         enmap_obj = enmap.ndmap(data,wcs)
 
         print("Generating HEALPix map...")
-        heapix_mask = reproject.healpix_from_enmap(enmap_obj, nside=nside, lmax=3*nside-1)
+        heapix_mask = reproject.map2healpix(enmap_obj, nside=nside, lmax=3*nside-1, rot='equ,gal', verbose=True, niter=0)
         
         return heapix_mask
 
@@ -199,9 +199,24 @@ if __name__ == '__main__':
     # for i in range(len(pathlist)):
     #     print(pathlist[i])
         
-    ells,beam = read_beam()
-    print(ells,beam)
+    # ells,beam = read_beam()
+    # print(ells,beam)
+    import matplotlib.pyplot as plt
+
+    # codex = get_ymap_index_act_selected(deprotype = 'cibdBeta',nu_range=[1.0,1.2],T_range=[10.7,12.0])
     
-    # codex = get_ymap_index_act_selected(deprotype = 'cibdBeta',nu_range=[1.0,1.4],T_range=[10.7,12.0])
     # for i in range(len(codex)):
     #     print(codex[i].deprotype,codex[i].nu,codex[i].T)
+    #     index = codex[i]
+    #     map = index.generate_map()
+    #     hp.mollview(map)
+    #     plt.savefig(f'./{index.filename}.png')
+    
+    codex = get_mask_index_act()
+    
+    index = codex[3]
+    print(index)
+    map = index.generate_map()
+    hp.mollview(map)
+    plt.savefig(f'./{index.filename}.png')
+        
