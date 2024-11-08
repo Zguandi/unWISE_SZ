@@ -19,7 +19,7 @@ def unwiseact(deprotype:str,nu_range=[1.0,2.0],T_range=[10.7,24.0]):
     unwise_map = mgm.makemap()
     
     print("reading unwisemask")
-    unwise_mask = mgm.read_compositemask(apodize=True)
+    unwise_mask = mgm.readmask(apodize=True)
     
     print("reading act mask")
     act_mask = di.read_composite_mask(apodize=True)
@@ -38,16 +38,16 @@ def unwiseact(deprotype:str,nu_range=[1.0,2.0],T_range=[10.7,24.0]):
     
     print("main loop for act map...")
     for index in act_map_codex:
-        print("\t generating y for "+index.filename,end='\r')
+        print("  generating y for "+index.filename,end='\r')
         y_field = nmt.NmtField(act_mask, [index.generate_map()],beam=beam)
         
-        print("\t computing gy for "+index.filename,end='\r')
+        print("  computing gy for "+index.filename,end='\r')
         cl_gy = nmt.compute_full_master(galaxy, y_field, b)
-        print("\t namaster gy complete for "+index.filename)
+        print("  namaster gy complete for "+index.filename)
         
-        print("\t computing yy for "+index.filename,end='\r')
+        print("  computing yy for "+index.filename,end='\r')
         cl_yy = nmt.compute_full_master(y_field, y_field, b)
-        print("\t namaster yy complete for "+index.filename)
+        print("  namaster yy complete for "+index.filename)
         
         names.append('{}_{}_T_{}_gy'.format(index.deprotype,index.nu,index.T))
         cols.append(cl_gy[0])
@@ -56,7 +56,7 @@ def unwiseact(deprotype:str,nu_range=[1.0,2.0],T_range=[10.7,24.0]):
         cols.append(cl_yy[0])
     
     print("saving results...")
-    np.savetxt(OUTPATH+'{}_results_nobeam.txt'.format(deprotype),np.array(cols).T,header=' '.join(names))
+    np.savetxt(OUTPATH+'{}_results_12_18.txt'.format(deprotype),np.array(cols).T,header=' '.join(names))
 
 # def beam_manual_interp(ells,beam):
 #     f = interp1d(ells,beam)
@@ -73,7 +73,8 @@ def read_results(deprotype:str):
     return table
     
 if __name__ == "__main__":
-    unwiseact('cibdBeta',nu_range=[1.0,1.1],T_range=[10.7,12.0])
+    # unwiseact('cibdBeta',nu_range=[1.0,1.1],T_range=[10.7,12.0])
+    unwiseact('cibdBeta',nu_range=[1.0,1.2],T_range=[10.7,24.0])
     # table = read_results('cibdBeta')
     # print(table.keys())
     # print(table['cibdBeta_1.0_T_10.7_yy'])

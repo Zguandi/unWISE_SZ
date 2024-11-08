@@ -88,8 +88,8 @@ class deprojection_index_act:
         wcs = wcsutils.WCS(header)
         enmap_obj = enmap.ndmap(data,wcs)
 
-        print("Generating HEALPix map...")
-        heapix_map = reproject.healpix_from_enmap(enmap_obj, nside=nside, lmax=3*nside-1)
+        # print("Generating HEALPix map...")
+        heapix_map = reproject.map2healpix(enmap_obj, nside=nside, lmax=3*nside-1, out=None, rot='cel,gal', spin=[0, 2], method='harm', order=1, extensive=False, bsize=100000, nside_mode='pow2', boundary='constant', verbose=True, niter=0)
         
         return heapix_map
 

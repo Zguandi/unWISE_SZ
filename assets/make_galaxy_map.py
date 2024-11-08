@@ -117,25 +117,25 @@ def readmask():
     ########################################
     print('Reading mask...')
     mask = hp.read_map(PATHMAP+'mask/mask_unWISE_full_v10.fits')
-    lost = fits.open(PATHMAP+"loss/unmaskedareafrac-flag.fits")
-    mask_lost = lost[0].data
-    valid = (mask_lost != 0).astype(np.float64)
+    # lost = fits.open(PATHMAP+"loss/unmaskedareafrac-flag.fits")
+    # mask_lost = lost[0].data
+    # valid = (mask_lost != 0).astype(np.float64)
     
-    galmask = mask * valid
+    # galmask = mask * valid
     ########################################
-    return galmask
+    return mask
 
-def read_compositemask(apodize = True):
-    ########################################
-    print('Reading mask...')
+# def read_compositemask(apodize = True):
+#     ########################################
+#     print('Reading mask...')
     
-    if apodize:
-        pathmask = DAT + 'unwiseact/unwise_mask_composite/healpix_unwise_mask_nside2048_apo1_5.fits'
-    else:
-        pathmask = DAT + 'unwiseact/unwise_mask_composite/healpix_unwise_mask_nside2048.fits'
+#     if apodize:
+#         pathmask = DAT + 'unwiseact/unwise_mask_composite/healpix_unwise_mask_nside2048_apo1_5.fits'
+#     else:
+#         pathmask = DAT + 'unwiseact/unwise_mask_composite/healpix_unwise_mask_nside2048.fits'
 
-    galmask = hp.read_map(pathmask)
-    return galmask
+#     galmask = hp.read_map(pathmask)
+#     return galmask
 
 if __name__ == "__main__":
     # mask = readmask()
