@@ -19,12 +19,22 @@ def main():
 
     enmap_obj = enmap.ndmap(mask_act_enmap, wcs)
     print("Generating HEALPix map...")
-    healpix_mask = reproject.healpix_from_enmap(enmap_obj, nside=NSIDE, lmax=3*NSIDE-1)
+    healpix_mask = reproject.map2healpix(enmap_obj, nside=NSIDE, lmax=3*NSIDE-1, rot='equ,gal', verbose=True, niter=0)
     
     print("Writing HEALPix map...")
     hp.write_map(DAT+'unwiseact/act_mask_composite/healpix_act_mask_nside2048.fits', healpix_mask, overwrite=True)
     
     print("Finished writing HEALPix map.")
 
+def readmask():
+    mask = hp.read_map(DAT+'unwiseact/act_mask_composite/healpix_act_mask_nside2048.fits')
+    return mask
+
+def cutoffmask():
+    mask = hp.read_map(DAT+'unwiseact/act_mask_composite/healpix_act_mask_nside2048.fits')
+    mask[mask < 0.0] = 0.0
+    mask[mask >= 1.0] = 1.0
+    hp.write_map(DAT+'unwiseact/act_mask_composite/healpix_act_mask_nside2048_cutoff.fits', mask, overwrite=True)
+    return mask
 if __name__ == '__main__':
-    main()
+    cutoffmask()
