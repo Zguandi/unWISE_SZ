@@ -4,7 +4,7 @@ BEAM = '/mnt/d/data_large/unwise_sz/ACT/act_beam/effective_beam.txt'
 import os
 import numpy as np
 from astropy.io import fits
-from pixell import enmap, utils, reproject, wcsutils
+from pixell import enmap, utils, reproject, wcsutils, enplot
 import healpy as hp
 
 class act_car_file:
@@ -23,12 +23,12 @@ class act_car_file:
         return enmap_data
     
     def read_map_to_array(self):
-        '''Read the map to a numpy array, return a dictionary with data and wcs'''
+        '''Read the map to a numpy array, return data and wcs'''
         hdul = fits.open(self.path)
         data = hdul[0].data
         wcs = wcsutils.WCS(hdul[0].header)
         hdul.close()
-        return {'data':data,'wcs':wcs}
+        return data,wcs
     
 class act_car_map(act_car_file):
     def __init__(self,directory:str,filename:str):
@@ -94,8 +94,46 @@ def get_mask_index_act(verbose=False):
 
 
 def read_beam():
-    '''Read the ACT beam file, return ells and beam values in dictionary'''
+    '''Read the ACT beam file, return ells and beam'''
     beam = np.loadtxt(BEAM,skiprows=1)
     ells = beam[:,0]
     beam = beam[:,1]
-    return {'ells':ells,'beam':beam}
+    return ells,beam
+
+def compute_composite_mask(apodize = False,verbose = False,outpath = None):
+    '''Compute the composite mask from all the masks, return the mask data and wcs'''
+    
+    if apodize:
+        print('apodize is not implemented yet')
+        return None
+    
+    mask_files = get_mask_index_act()
+    mask_data,wcs = mask_files[0].read_map_to_array()
+    
+    for i in range(1,len(mask_files)):
+        mask_data_n,wcs_n = mask_files[i].read_map_to_array()
+        if wcs != wcs_n:
+            print(f'wcs mismatch: {wcs} vs {wcs_n}')
+            return None
+        mask_data = mask_data * mask_data_n
+        print(f'added mask {mask_files[i]}') if verbose else None
+    
+    if outpath:
+        hdu = fits.PrimaryHDU(mask_data,header=wcs.to_header())
+        hdu.writeto(outpath,overwrite=True)
+        print(f'saved mask to {outpath}')
+    return mask_data,wcs
+
+def eshow(x,save=False,**kwargs):
+    ''' Define a function to help us plot the enmaps neatly '''
+    plots = enplot.get_plots(x, **kwargs)
+    enplot.show(plots, method = "ipython")
+    # save figure
+    enplot.write("test.png", plots) if save else None
+
+if __name__ == "__main__":
+    codex = get_ymap_index_act(verbose=True)
+    map_y = codex[0].read_map_to_enmap()
+    eshow(map_y,downgrade=10,save=True)
+    
+    
