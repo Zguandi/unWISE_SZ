@@ -181,11 +181,11 @@ def read_beam():
     beam = beam[:,1]
     return ells,beam
 
-def read_composite_mask(apodize = True):
+def read_composite_mask(apodize = False):
     if apodize:
         pathmask = DAT + 'unwiseact/act_mask_composite/healpix_act_mask_nside2048_apo1_5.fits'
     else:
-        pathmask = DAT + 'unwiseact/act_mask_composite/healpix_act_mask_nside2048.fits'
+        pathmask = DAT+'unwiseact/act_mask_composite/healpix_act_mask_nside2048_cutoff.fits'
     mask = hp.read_map(pathmask)
     return mask
 
@@ -212,11 +212,15 @@ if __name__ == '__main__':
     #     hp.mollview(map)
     #     plt.savefig(f'./{index.filename}.png')
     
-    codex = get_mask_index_act()
+    # codex = get_mask_index_act()
     
-    index = codex[3]
-    print(index)
-    map = index.generate_map()
-    hp.mollview(map)
-    plt.savefig(f'./{index.filename}.png')
+    # index = codex[3]
+    # print(index)
+    # map = index.generate_map()
+    # hp.mollview(map)
+    # plt.savefig(f'./{index.filename}.png')
+    
+    mask_composite = read_composite_mask(apodize=False)
+    hp.mollview(mask_composite)
+    plt.savefig('./mask_composite.png')
         
