@@ -4,8 +4,9 @@ BEAM = '/mnt/d/data_large/unwise_sz/ACT/act_beam/effective_beam.txt'
 import os
 import numpy as np
 from astropy.io import fits
-from pixell import enmap, utils, reproject, wcsutils, enplot
+from pixell import enmap, utils, reproject, enplot
 import healpy as hp
+from astropy.wcs import WCS
 
 class act_car_file:
     def __init__(self,directory:str,filename:str):
@@ -26,7 +27,7 @@ class act_car_file:
         '''Read the map to a numpy array, return data and wcs'''
         hdul = fits.open(self.path)
         data = hdul[0].data
-        wcs = wcsutils.WCS(hdul[0].header)
+        wcs = WCS(hdul[0].header)
         hdul.close()
         return data,wcs
     
@@ -84,10 +85,10 @@ def get_ymap_index_act_selected(deprotype,beta_range=[1.0,2.0],T_range=[10.7,24.
 
 def get_mask_index_act(verbose=False):
     '''Get all the ACT masks, return a list of mask objects'''
-    filename = os.listdir(DAT+'ACT/masks/')
+    filename = os.listdir(DAT+'ACT/mask/')
     car_masks = []
     for i in range(len(filename)):
-        car_mask =  act_car_mask(DAT+'ACT/masks/',filename[i])
+        car_mask =  act_car_mask(DAT+'ACT/mask/',filename[i])
         car_masks.append(car_mask)
         print(f'loaded {car_mask}') if verbose else None
     return car_masks
@@ -112,9 +113,9 @@ def compute_composite_mask(apodize = False,verbose = False,outpath = None):
     
     for i in range(1,len(mask_files)):
         mask_data_n,wcs_n = mask_files[i].read_map_to_array()
-        if wcs != wcs_n:
-            print(f'wcs mismatch: {wcs} vs {wcs_n}')
-            return None
+        # if wcs != wcs_n:
+        #     print(f'wcs mismatch: {wcs} vs {wcs_n}')
+        #     return None
         mask_data = mask_data * mask_data_n
         print(f'added mask {mask_files[i]}') if verbose else None
     
@@ -123,6 +124,19 @@ def compute_composite_mask(apodize = False,verbose = False,outpath = None):
         hdu.writeto(outpath,overwrite=True)
         print(f'saved mask to {outpath}')
     return mask_data,wcs
+
+def read_composite_mask_to_array():
+    '''Read the composite mask @ DAT+'ACT/mask_car/composite_mask_car.fits', return data and wcs'''
+    path = DAT+'ACT/mask_car/composite_mask_car.fits'
+    hdul = fits.open(path)
+    wcs = WCS(hdul[0].header)
+    mask = hdul[0].data
+    return mask,wcs
+
+def read_composite_mask_to_enmap():
+    '''Read the composite mask @ DAT+'ACT/mask_car/composite_mask_car.fits', return enmap object'''
+    mask,wcs = read_composite_mask_to_array()
+    return enmap.enmap(mask,wcs)
 
 def eshow(x,save=False,**kwargs):
     ''' Define a function to help us plot the enmaps neatly '''
@@ -133,7 +147,7 @@ def eshow(x,save=False,**kwargs):
 
 if __name__ == "__main__":
     codex = get_ymap_index_act(verbose=True)
-    map_y = codex[0].read_map_to_enmap()
-    eshow(map_y,downgrade=10,save=True)
+    # map_y = codex[0].read_map_to_enmap()
+    # eshow(map_y,downgrade=10,save=True)
     
-    
+    # compute_composite_mask(apodize=False,verbose=True,outpath=DAT+'ACT/mask_car/composite_mask_car.fits')

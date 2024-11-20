@@ -11,7 +11,7 @@ import pandas as pd
 DAT = di.DAT
 NSIDE = 2048
 BIN = 50
-OUTPATH = '/mnt/c/Users/gdzhao/projects/unwise_sz/unwiseact_results/'
+OUTPATH = '/mnt/c/Users/gdzhao/projects/unwise_sz/unwiseact_results/healpix/'
 
 def unwiseact(deprotype:str,nu_range=[1.0,1.2],T_range=[10.7,12.0]):
     
