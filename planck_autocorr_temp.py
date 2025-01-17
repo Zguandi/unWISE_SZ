@@ -2,6 +2,7 @@ import numpy as np
 import healpy as hp
 from astropy.io import fits
 import pymaster as nmt
+import matplotlib.pyplot as plt
 
 NSIDE = 2048
 binnum = 50
@@ -23,20 +24,22 @@ mask_apodized = hp.ud_grade(mask_apodized, nside_out=NSIDE)
 map = hp.read_map(pathMapPlanck, field=0)
 map = hp.ud_grade(map, nside_out=NSIDE)
 
-b = nmt.NmtBin.from_nside_linear(NSIDE, binnum)
+hp.mollview(map)
+plt.savefig('map.png')
+# b = nmt.NmtBin.from_nside_linear(NSIDE, binnum)
 
-cols = [b.get_effective_ells()]
-names = ['ell']
+# cols = [b.get_effective_ells()]
+# names = ['ell']
 
-print('Making temperature field...')
-temp = nmt.NmtField(mask_apodized, [map])
+# print('Making temperature field...')
+# temp = nmt.NmtField(mask_apodized, [map])
 
-print('Computing cltt...')
-cl_tt = nmt.compute_full_master(temp, temp, b)
+# print('Computing cltt...')
+# cl_tt = nmt.compute_full_master(temp, temp, b)
 
-cols.append(cl_tt[0])
-names.append('cltt')
+# cols.append(cl_tt[0])
+# names.append('cltt')
 
-print('Saving gy and yy...')
-np.savetxt(OUT + f'namaster_cltt.txt',np.column_stack(cols),header=' '.join(names))
-print('Done!')
+# print('Saving gy and yy...')
+# np.savetxt(OUT + f'namaster_cltt.txt',np.column_stack(cols),header=' '.join(names))
+# print('Done!')

@@ -127,6 +127,7 @@ class mask_index_act:
 def get_ymap_index_act():
     filename_cib = os.listdir(DAT+'ACT/deprojections/cib/')
     filename_cibdbeta = os.listdir(DAT+'ACT/deprojections/cib_cibdbeta/')
+    filename_cibdbetadt = os.listdir(DAT+'ACT/deprojections/cib_cibdbeta_cibdt/')
     
     codex = []
     for i in range(len(filename_cib)):
@@ -134,12 +135,17 @@ def get_ymap_index_act():
         codex.append(index)
     for i in range(len(filename_cibdbeta)):
         index =  deprojection_index_act(DAT+'ACT/deprojections/cib_cibdbeta/',filename_cibdbeta[i])
+        codex.append(index)
+    for i in range(len(filename_cibdbetadt)):
+        index =  deprojection_index_act(DAT+'ACT/deprojections/cib_cibdBeta_cibdT/',filename_cibdbetadt[i])
+        index.deprotype = 'cibdBetadT'
         codex.append(index)
     return codex
 
 def get_ymap_index_act_selected(deprotype,nu_range=[1.0,2.0],T_range=[10.7,24.0]):
     filename_cib = os.listdir(DAT+'ACT/deprojections/cib/')
     filename_cibdbeta = os.listdir(DAT+'ACT/deprojections/cib_cibdbeta/')
+    filename_cibdbetadt = os.listdir(DAT+'ACT/deprojections/cib_cibdbeta_cibdt/')
     
     codex = []
     for i in range(len(filename_cib)):
@@ -157,7 +163,15 @@ def get_ymap_index_act_selected(deprotype,nu_range=[1.0,2.0],T_range=[10.7,24.0]
             if index.nu<=nu_range[1] and index.nu>=nu_range[0]:
                 if index.T<=T_range[1] and index.T>=T_range[0]:
                     codex.append(index)
-                    
+    
+    for i in range(len(filename_cibdbetadt)):
+        index =  deprojection_index_act(DAT+'ACT/deprojections/cib_cibdBeta_cibdT/',filename_cibdbetadt[i])
+        index.deprotype = 'cibdBetadT'
+        
+        if index.deprotype == deprotype:
+            if index.nu<=nu_range[1] and index.nu>=nu_range[0]:
+                if index.T<=T_range[1] and index.T>=T_range[0]:
+                    codex.append(index)
     return codex
 
 def get_ACT_mask_path():
@@ -190,10 +204,10 @@ def read_composite_mask(apodize = False):
     return mask
 
 if __name__ == '__main__':
-    # codex = get_ymap_index_act()
+    codex = get_ymap_index_act()
     
-    # for i in range(len(codex)):
-    #     print(codex[i].deprotype,codex[i].nu,codex[i].T)
+    for i in range(len(codex)):
+        print(codex[i].deprotype,codex[i].nu,codex[i].T)
         
     # pathlist = get_ACT_mask_path()
     # for i in range(len(pathlist)):
@@ -201,7 +215,7 @@ if __name__ == '__main__':
         
     # ells,beam = read_beam()
     # print(ells,beam)
-    import matplotlib.pyplot as plt
+    # import matplotlib.pyplot as plt
 
     # codex = get_ymap_index_act_selected(deprotype = 'cibdBeta',nu_range=[1.0,1.2],T_range=[10.7,12.0])
     
@@ -220,7 +234,7 @@ if __name__ == '__main__':
     # hp.mollview(map)
     # plt.savefig(f'./{index.filename}.png')
     
-    mask_composite = read_composite_mask(apodize=False)
-    hp.mollview(mask_composite)
-    plt.savefig('./mask_composite.png')
+    # # mask_composite = read_composite_mask(apodize=False)
+    # hp.mollview(mask_composite)
+    # plt.savefig('./mask_composite.png')
         

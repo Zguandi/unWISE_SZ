@@ -130,3 +130,10 @@ figures/mask/mask_composite.png
 figures/mask/mask_subtracted_sources.fits.png
 figures/mask/wide_mask_GAL070_apod_1.50_deg_wExtended_hd.fits.png
 wide_mask_GAL070_apod_1.50_deg_wExtended_hd.fits.png
+unwiseact_results/car/yy_cib_cibdBeta_cibdT_T10.7_beta1.7.txt
+unwiseact_results/car/yy_cib_cibdBeta_T10.7_beta1.0.txt
+unwiseact_results/car/yy_cib_cibdBeta_T10.7_beta1.2.txt
+unwiseact_results/car/yy_cib_cibdBeta_T10.7_beta1.4.txt
+unwiseact_results/car/yy_cib_cibdBeta_T10.7_beta1.7.txt
+unwiseact_results/car/yy_cib_T10.7_beta1.7.txt
+assets/__pycache__/act_car.cpython-311.pyc

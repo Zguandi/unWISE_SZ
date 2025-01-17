@@ -11,14 +11,11 @@ import gc
 
 NSIDE = 2048
 binwidth = 50
-outpath = '/mnt/c/Users/gdzhao/projects/unwise_sz/unwiseact_results/car/'
+outpath = '/cluster/home/guzhao/projects/unWISE_SZ/unwiseact_results/car/batch/'
 
-# deprotype = 'cib_cibdBeta_cibdT'
-# deprotype = 'cib_cibdBeta'
-# deprotype = 'cib'
-
-selected_maps = act.get_ymap_index_act_selected(deprotype='cib_cibdBeta',beta_range=[1.21,1.4],T_range=[10.0,12.0],verbose=True)
-# map_index = selected_maps[0]
+selected_maps = act.get_ymap_index_act_selected(deprotype='cib_cibdBeta_cibdT',beta_range=[1.65,1.72],T_range=[10.0,12.0],verbose=True)
+map_index = selected_maps[0]
+print(map_index)
 
 b = nmt.NmtBin.from_nside_linear(NSIDE, binwidth)
 ells = b.get_effective_ells()
@@ -49,45 +46,42 @@ ells = b.get_effective_ells()
 # DOWNGRADE for MEM LIMIT#
 ##########################
 
-for map_index in selected_maps:
-    print(map_index)
-    print('downgrading ymaps')
-    ymap_enmap = map_index.read_map_to_enmap()
-    ymap_enmap = enmap.downgrade(ymap_enmap, 2)
-    wcs = ymap_enmap.wcs
-    ymap = np.array(ymap_enmap)
+print('reading ymaps')
+ymap_enmap = map_index.read_map_to_enmap()
+# ymap_enmap = enmap.downgrade(ymap_enmap, 2)
+wcs = ymap_enmap.wcs
+ymap = np.array(ymap_enmap)
 
-    del ymap_enmap
-    gc.collect()
+del ymap_enmap
+gc.collect()
 
-    print('downgrading mask')
-    mask_enmap = act.read_composite_mask_to_enmap()
-    mask_enmap = enmap.downgrade(mask_enmap, 2)
-    wcs_n = mask_enmap.wcs
-    mask = np.array(mask_enmap)
+print('reading mask')
+mask_enmap = act.read_composite_mask_to_enmap()
+# mask_enmap = enmap.downgrade(mask_enmap, 2)
+wcs_n = mask_enmap.wcs
+mask = np.array(mask_enmap)
 
-    del mask_enmap
-    gc.collect()
+del mask_enmap
+gc.collect()
 
-    lls, beam = act.read_beam()
-    y_field = nmt.NmtField(mask, [ymap], wcs = wcs, n_iter=0,beam = beam)
+lls, beam = act.read_beam()
+y_field = nmt.NmtField(mask, [ymap], wcs = wcs, n_iter=0,beam = beam)
 
-    print('downgraded y field created')
-    del ymap, mask
-    gc.collect()
+del ymap, mask
+gc.collect()
 
-    model_beta = map_index.beta
-    model_t = map_index.T
-    model_deprotype = map_index.deprotype
+model_beta = map_index.beta
+model_t = map_index.T
+model_deprotype = map_index.deprotype
 
-    yy_filename =  f"{outpath}yy_{model_deprotype}_T{model_t}_beta{model_beta}.txt"
+yy_filename =  f"{outpath}yy_{model_deprotype}_T{model_t}_beta{model_beta}.txt"
 
-    print('y field created, with shape:',y_field.get_maps()[0].shape)
+print('y field created, with shape:',y_field.get_maps()[0].shape)
 
-    cl_yy = nmt.compute_full_master(y_field, y_field, b)
-    print('namaster yy complete')
+cl_yy = nmt.compute_full_master(y_field, y_field, b)
+print('namaster yy complete')
 
-    np.savetxt(yy_filename,np.array([ells,cl_yy[0]]).T,header='ell cl_yy')
+np.savetxt(yy_filename,np.array([ells,cl_yy[0]]).T,header='ell cl_yy')
 
 # cl_gy = nmt.compute_full_master(g_field, y_field, b)
 # print('namaster gy complete')
