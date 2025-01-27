@@ -147,7 +147,9 @@ def eshow(x,save=False,**kwargs):
 
 if __name__ == "__main__":
     codex = get_ymap_index_act(verbose=True)
-    # map_y = codex[0].read_map_to_enmap()
+    map_y,wcs = codex[0].read_map_to_array()
+    print(map_y.shape)
+    print(wcs)
     # eshow(map_y,downgrade=10,save=True)
     
     # compute_composite_mask(apodize=False,verbose=True,outpath=DAT+'ACT/mask_car/composite_mask_car.fits')

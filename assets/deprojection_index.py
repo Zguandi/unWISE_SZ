@@ -206,18 +206,18 @@ def read_composite_mask(apodize = False):
 if __name__ == '__main__':
     codex = get_ymap_index_act()
     
-    for i in range(len(codex)):
-        print(codex[i].deprotype,codex[i].nu,codex[i].T)
+    # for i in range(len(codex)):
+    #     print(codex[i].deprotype,codex[i].nu,codex[i].T)
         
     # pathlist = get_ACT_mask_path()
     # for i in range(len(pathlist)):
     #     print(pathlist[i])
         
-    # ells,beam = read_beam()
-    # print(ells,beam)
-    # import matplotlib.pyplot as plt
+    ells,beam = read_beam()
+    print(ells,beam)
+    import matplotlib.pyplot as plt
 
-    # codex = get_ymap_index_act_selected(deprotype = 'cibdBeta',nu_range=[1.0,1.2],T_range=[10.7,12.0])
+    codex = get_ymap_index_act_selected(deprotype = 'cibdBeta',nu_range=[1.0,1.2],T_range=[10.7,24.0])
     
     # for i in range(len(codex)):
     #     print(codex[i].deprotype,codex[i].nu,codex[i].T)
@@ -228,11 +228,11 @@ if __name__ == '__main__':
     
     # codex = get_mask_index_act()
     
-    # index = codex[3]
-    # print(index)
-    # map = index.generate_map()
-    # hp.mollview(map)
-    # plt.savefig(f'./{index.filename}.png')
+    index = codex[3]
+    print(index)
+    map = index.generate_map()
+    hp.mollview(map)
+    plt.savefig(f'./{index.filename}.png')
     
     # # mask_composite = read_composite_mask(apodize=False)
     # hp.mollview(mask_composite)

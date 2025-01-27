@@ -137,3 +137,6 @@ unwiseact_results/car/yy_cib_cibdBeta_T10.7_beta1.4.txt
 unwiseact_results/car/yy_cib_cibdBeta_T10.7_beta1.7.txt
 unwiseact_results/car/yy_cib_T10.7_beta1.7.txt
 assets/__pycache__/act_car.cpython-311.pyc
+ilc_actplanck_ymap_deproj_cib_cibdBeta_1.2_10.7.fits.png
+assets/__pycache__/galaxy_map_read.cpython-311.pyc
+assets/__pycache__/make_galaxy_map.cpython-311.pyc
