@@ -47,7 +47,7 @@ def makemap_healpix(sample: str):
     
     ########################################
     
-    print('\t Reading weights...',end = "\r") 
+    print('  -> Reading weights...',end = "\r") 
     weight1 = hp.read_map(path_weight1)
     weight2 = hp.read_map(path_weight2)
     weights = hp.ud_grade(weight1*weight2,2048)
@@ -55,7 +55,7 @@ def makemap_healpix(sample: str):
     ########################################
     
     # Converting the masked number counts to delta_n/n. Only consider unmasked regions!
-    print('\t Making galaxy map ' + sample,end = "\r")
+    print('  -> Making galaxy map ' + sample,end = "\r")
     numcounts_map = hp.read_map(map_path, field=[0])
     numcounts_map = numcounts_map * weights
     # Correct for lower density in regions of high area lost due to stars or stellar masking
@@ -67,23 +67,24 @@ def makemap_healpix(sample: str):
     
     ########################################
     
-    print('\t Reading mask and loss...',end = "\r")
+    print('  -> Reading mask and loss...',end = "\r")
     mask = hp.read_map(mask_path)
     lost = fits.open(loss_path)
     
     if sample == "blue":
         loss_map = lost[0].data
         
-        print("\t loss_map generated with shape:",loss_map.shape,end = "\r")
+        print("  -> loss_map generated with shape:",loss_map.shape,end = "\r")
     elif sample == "midz" or sample == "lowz":
-        loss_data = lost[1].data
-        loss_column = loss_data.field(0)
-        loss_map = np.concatenate(loss_column)
+        # loss_data = lost[1].data
+        # loss_column = loss_data.field(0)
+        # loss_map = np.concatenate(loss_column)
         
-        # set nan values of loss to 1.0
-        loss_map[np.isnan(loss_map)] = 1.0
+        # # set nan values of loss to 1.0
+        # loss_map[np.isnan(loss_map)] = 1.0
+        loss_map = np.ones(12*NSIDE**2)
         
-        # print("\t loss_map generated with shape:",loss_map.shape,end = "\r")
+        print("  -> loss_map generated with shape:",loss_map.shape,end = "\r")
     else:
         raise ValueError("Invalid sample")
     
@@ -91,7 +92,7 @@ def makemap_healpix(sample: str):
     
     ########################################
     
-    print("\t compositing loss and normalizing...",end = "\r")
+    print("  -> compositing loss and normalizing...",end = "\r")
     numcounts_map = numcounts_map / loss_map
     masked_count = numcounts_map * mask
     mean_count = np.nansum(masked_count) / np.nansum(mask)
@@ -108,16 +109,16 @@ def makemap_healpix(sample: str):
     #hp.mollview(map)
     #pl.show()
     ########################################
-    print('Galaxy sample generating finished for ' + sample)
+    print('Galaxy sample generating finished for',sample,'          ')
     return map
 
 def readmask(sample: str):
     
     map_path, mask_path, loss_path, path_weight1, path_weight2 = read_path(sample)
     
-    print('Reading mask...')
+    print('Reading mask...',end="\r")
     mask = hp.read_map(mask_path)
-    
+    print('Galaxy mask ready for',sample,'          ')
     # the mask is apodized already, and ready to use
     
     return mask
@@ -134,6 +135,12 @@ if __name__ == "__main__":
     sample = 'lowz'
     
     map = makemap_healpix(sample)
+    print(np.min(map),np.max(map))
+    print(np.sum(map))
+    
+    
+    # hp.mollview(map)
+    # plt.savefig('./lowz_map.png')
     # mask = readmask(sample)
     # print(np.min(mask),np.max(mask))
     # map = makemap_healpix(sample)
