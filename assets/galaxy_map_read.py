@@ -25,12 +25,12 @@ def read_path(sample: str):
         case "midz": # midz sample
             map_path = DAT + 'midz/map_healpix/midz_fullsky_catalog_agglomerative_clustering_fix_healpix2048.fits'
             mask_path = DAT + 'midz/mask_healpix/mask_unWISE_full_v10.fits'
-            loss_path = DAT + 'midz/loss_healpix/neo8-areamask-midz-2048.fits'
+            loss_path = DAT + 'blue/loss_healpix/unmaskedareafrac-flag.fits'
             
         case "lowz": # lowz sample
             map_path = DAT + 'lowz/map_healpix/lowz_fullsky_catalog_agglomerative_clustering_fix_healpix2048.fits'
             mask_path = DAT + 'lowz/mask_healpix/mask_unWISE_full_v10.fits'
-            loss_path = DAT + 'lowz/loss_healpix/neo8-areamask-lowz-2048.fits'
+            loss_path = DAT + 'blue/loss_healpix/unmaskedareafrac-flag.fits'
     
     #"D:\data_large\unwise_sz\unWISE\weights\blue_star_weights.fits"
     path_weight1 = DAT + 'weights/blue_star_weights.fits'
@@ -57,7 +57,11 @@ def makemap_healpix(sample: str):
     # Converting the masked number counts to delta_n/n. Only consider unmasked regions!
     print('  -> Making galaxy map ' + sample,end = "\r")
     numcounts_map = hp.read_map(map_path, field=[0])
-    numcounts_map = numcounts_map * weights
+    
+    if sample == "blue":
+        numcounts_map = numcounts_map * weights
+    else:
+        numcounts_map = numcounts_map
     # Correct for lower density in regions of high area lost due to stars or stellar masking
     
     ########################################
@@ -82,8 +86,7 @@ def makemap_healpix(sample: str):
         
         # # set nan values of loss to 1.0
         # loss_map[np.isnan(loss_map)] = 1.0
-        loss_map = np.ones(12*NSIDE**2)
-        
+        loss_map = lost[0].data
         print("  -> loss_map generated with shape:",loss_map.shape,end = "\r")
     else:
         raise ValueError("Invalid sample")
@@ -132,11 +135,11 @@ if __name__ == "__main__":
     # print(np.min(blue_counts_map),np.max(blue_counts_map))
     # print(np.sum(blue_counts_map))
     
-    sample = 'lowz'
+    sample = 'midz'
     
     map = makemap_healpix(sample)
-    print(np.min(map),np.max(map))
-    print(np.sum(map))
+    # print(np.min(map),np.max(map))
+    # print(np.sum(map))
     
     
     # hp.mollview(map)

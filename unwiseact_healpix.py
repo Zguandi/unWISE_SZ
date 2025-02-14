@@ -13,8 +13,8 @@ import pandas as pd
 DAT = di.DAT
 NSIDE = 2048
 BIN = 50
-OUTPATH = '/mnt/c/Users/gdzhao/projects/unwise_sz/unwiseact_results/healpix_midz/'
-wisesample = 'midz'
+OUTPATH = '/mnt/c/Users/gdzhao/projects/unwise_sz/unwiseact_results/healpix_midz_blueloss/'
+wisesample = 'blue'
 deprotype = 'cibdBeta'
 
 
@@ -221,6 +221,6 @@ if __name__ == "__main__":
     if not os.path.exists(OUTPATH):
         os.makedirs(OUTPATH)
         
-    unwise_zsample_act_jitsave(wisesample,deprotype,nu_range=[1.0,2.0],T_range=[10.7,24.0])
+    unwise_zsample_act_jitsave(wisesample,deprotype,nu_range=[1.55,1.65],T_range=[10.7,10.8])
     
     # unwise_auto('lowz')
