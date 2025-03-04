@@ -1,4 +1,4 @@
-# This is the unWISE-SZ cross correlatiion project page.
+# This is the unWISE-SZ cross correlation project page.
 
 We aim to do the cross correlation between unWISE blue galaxies and the tSZ map from CMB surveys.
 
